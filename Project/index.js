@@ -1,82 +1,156 @@
-const PLAYER_X_CLASS = 'x'
-const PLAYER_O_CLASS = 'circle'
-const WINNING_COMBINATIONS = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
-]
-const cellElements = document.querySelectorAll('[data-cell]')
-const boardElement = document.getElementById('board')
-const winningMessageElement = document.getElementById('winningMessage')
-const restartButton = document.getElementById('restartButton')
-const winningMessageTextElement = document.getElementById('winningMessageText')
-let isPlayer_O_Turn = false
-startGame()
-
-restartButton.addEventListener('click', startGame)
-
-function startGame() {
-    isPlayer_O_Turn = false
-    cellElements.forEach(cell => {
-        cell.classList.remove(PLAYER_X_CLASS)
-        cell.classList.remove(PLAYER_O_CLASS)
-        cell.removeEventListener('click', handleCellClick)
-        cell.addEventListener('click', handleCellClick, { once: true })
-    })
-    setBoardHoverClass()
-    winningMessageElement.classList.remove('show')
-}
-function handleCellClick(e) {
-    const cell = e.target
-    const currentClass = isPlayer_O_Turn ? PLAYER_O_CLASS : PLAYER_X_CLASS
-    placeMark(cell, currentClass)
-    if (checkWin(currentClass)) {
-        endGame(false)
-    } else if (isDraw()) {
-        endGame(true)
-    } else {
-        swapTurns()
-        setBoardHoverClass()
+(function(){
+    // Functions
+    function buildQuiz(){
+      // variable to store the HTML output
+      const output = [];
+  
+      // for each question...
+      myQuestions.forEach(
+        (currentQuestion, questionNumber) => {
+  
+          // variable to store the list of possible answers
+          const answers = [];
+  
+          // and for each available answer...
+          for(letter in currentQuestion.answers){
+  
+            // ...add an HTML radio button
+            answers.push(
+              `<label>
+                <input type="radio" name="question${questionNumber}" value="${letter}">
+                ${letter} :
+                ${currentQuestion.answers[letter]}
+              </label>`
+            );
+          }
+  
+          // add this question and its answers to the output
+          output.push(
+            `<div class="slide">
+              <div class="question"> ${currentQuestion.question} </div>
+              <div class="answers"> ${answers.join("")} </div>
+            </div>`
+          );
+        }
+      );
+  
+      // finally combine our output list into one string of HTML and put it on the page
+      quizContainer.innerHTML = output.join('');
     }
-}
-function endGame(draw) {
-    if (draw) {
-        winningMessageElement.innerText = "It's a draw!"
-    } else {
-        winningMessageElement.innerText = `Player with ${isPlayer_O_Turn ? "O's" : "X's"} wins!`
+  
+    function showResults(){
+  
+      // gather answer containers from our quiz
+      const answerContainers = quizContainer.querySelectorAll('.answers');
+  
+      // keep track of user's answers
+      let numCorrect = 0;
+  
+      // for each question...
+      myQuestions.forEach( (currentQuestion, questionNumber) => {
+  
+        // find selected answer
+        const answerContainer = answerContainers[questionNumber];
+        const selector = `input[name=question${questionNumber}]:checked`;
+        const userAnswer = (answerContainer.querySelector(selector) || {}).value;
+  
+        // if answer is correct
+        if(userAnswer === currentQuestion.correctAnswer){
+          // add to the number of correct answers
+          numCorrect++;
+  
+          // color the answers green
+          answerContainers[questionNumber].style.color = 'blue';
+        }
+        // if answer is wrong or blank
+        else{
+          // color the answers red
+          answerContainers[questionNumber].style.color = 'red';
+        }
+      });
+  
+      // show number of correct answers out of total
+      resultsContainer.innerHTML = `${numCorrect} out of ${myQuestions.length}`;
     }
-    winningMessageElement.classList.add('show')
-}
-function isDraw() {
-    return [...cellElements].every(cell => {
-        return cell.classList.contains(PLAYER_X_CLASS) || cell.classList.contains(PLAYER_O_CLASS)
-    })
-}
-function placeMark(cell, currentClass) {
-    cell.classList.add(currentClass)
-}
-
-function swapTurns() {
-    isPlayer_O_Turn = !isPlayer_O_Turn
-}
-function setBoardHoverClass() {
-    boardElement.classList.remove(PLAYER_X_CLASS)
-    boardElement.classList.remove(PLAYER_O_CLASS)
-    if (isPlayer_O_Turn) {
-        boardElement.classList.add(PLAYER_O_CLASS)
-    } else {
-        boardElement.classList.add(PLAYER_X_CLASS)
+  
+    function showSlide(n) {
+      slides[currentSlide].classList.remove('active-slide');
+      slides[n].classList.add('active-slide');
+      currentSlide = n;
+      if(currentSlide === 0){
+        previousButton.style.display = 'none';
+      }
+      else{
+        previousButton.style.display = 'inline-block';
+      }
+      if(currentSlide === slides.length-1){
+        nextButton.style.display = 'none';
+        submitButton.style.display = 'inline-block';
+      }
+      else{
+        nextButton.style.display = 'inline-block';
+        submitButton.style.display = 'none';
+      }
     }
-}
-function checkWin(currentClass) {
-    return WINNING_COMBINATIONS.some(combination => {
-        return combination.every(index => {
-            return cellElements[index].classList.contains(currentClass)
-        })
-    })
-}
+  
+    function showNextSlide() {
+      showSlide(currentSlide + 1);
+    }
+  
+    function showPreviousSlide() {
+      showSlide(currentSlide - 1);
+    }
+  
+    // Variables
+    const quizContainer = document.getElementById('quiz');
+    const resultsContainer = document.getElementById('results');
+    const submitButton = document.getElementById('submit');
+    const myQuestions = [
+      {
+        question: "Who invented JavaScript?",
+        answers: {
+          a: "Douglas Crockford",
+          b: "Sheryl Sandberg",
+          c: "Brendan Eich"
+        },
+        correctAnswer: "c"
+      },
+      {
+        question: "How many people are there in LCJ?",
+        answers: {
+          a: "31",
+          b: "30",
+          c: "32"
+        },
+        correctAnswer: "c"
+      },
+      {
+        question: "Which is the highest peak of the world?",
+        answers: {
+          a: "Mt. K2",
+          b: "Mt. Everest",
+          c: "Mt. Fuji",
+          d: "Denali"
+        },
+        correctAnswer: "b"
+      }
+    ];
+  
+    // Kick things off
+    buildQuiz();
+  
+    // Pagination
+    const previousButton = document.getElementById("previous");
+    const nextButton = document.getElementById("next");
+    const slides = document.querySelectorAll(".slide");
+    let currentSlide = 0;
+  
+    // Show the first slide
+    showSlide(currentSlide);
+  
+    // Event listeners
+    submitButton.addEventListener('click', showResults);
+    previousButton.addEventListener("click", showPreviousSlide);
+    nextButton.addEventListener("click", showNextSlide);
+  })();
+  

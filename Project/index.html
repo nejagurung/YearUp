@@ -1,33 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en"></html>
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="index.css">
-    <title>Tic-Tac-Toe</title>
-    
+    <title> Quiz </title>
 </head>
-
-<body>
-     <div class="board" id="board">
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
+<body> 
+    <h1>Quiz on Important Facts</h1>
+    <div class="quiz-container">
+        <div id="quiz"></div>
     </div>
-    <div class="winning-message" id="winningMessage">
-    <br>
-        <div id="winningMessageText"></div>
-        <button id="restartButton">Restart</button>
-    </div>
+<button id="previous">Previous Question</button>
+<button id="next">Next Question</button>
+<button id="submit">Submit Quiz</button>
+<div id="results"></div>
+<script src="index.js"></script> 
 </body>
-<script src="index.js"></script>
-</html>
-   
+</html> 

@@ -1,121 +1,71 @@
-:root {
-	--cell-size: 100px;
+@import url(https://fonts.googleapis.com/css?family=Work+Sans:300,600);
 
-	--color: #2f7eed; /* for hover */
-	--color-set: #38e8ca; /* when set */
-	--l: 20px; /* X line-width */
+body{
+	font-size: 20px;
+	font-family: 'Work Sans', sans-serif;
+	color: #333;
+  font-weight: 300;
+  text-align: center;
+  background-color: #f8f6f0;
+  background-image: url('background.gif');
+  background-repeat: no-repeat;
+  background-size: cover;
 }
-
-body {
-	margin: 0;
-    background-image: url(https://giffiles.alphacoders.com/350/35050.gif);
-    background-size: cover;
+h1{
+  font-weight: 300;
+  margin: 0px;
+  padding: 10px;
+  font-size: 20px;
+  background-color: #444;
+  color: #fff;
 }
-
-.board {
-	width: 100vw;
-	height: 100vh;
-	display: grid;
-	justify-content: center;
-	align-content: center;
-	justify-items: center;
-	align-items: center;
-	grid-template-columns: repeat(3, auto)
+.question{
+  font-size: 30px;
+  margin-bottom: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-style: bold;
 }
-.cell {
-	width: var(--cell-size);
-	height: var(--cell-size);
-	border: 3px solid rgb(3, 174, 174);
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	position: relative;
+.answers {
+  margin-bottom: 30px;
+  text-align: left;
+  display: inline-block;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.answers label{
+  display: block;
+  margin-bottom: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+button{
+  font-family: 'Work Sans', sans-serif;
+	font-size: 22px;
+	background-color: #279;
+	color: #fff;
+	border: 0px;
+	border-radius: 3px;
+	padding: 20px;
 	cursor: pointer;
+	margin-bottom: 20px;
 }
-/* remove border for edges */
-.cell:nth-child(1), .cell:nth-child(2), .cell:nth-child(3) {
-	border-top: none;
-}
-
-.cell:nth-child(1), .cell:nth-child(4), .cell:nth-child(7) {
-	border-left: none;
+button:hover{
+	background-color: #38a;
 }
 
-.cell:nth-child(3), .cell:nth-child(6), .cell:nth-child(9) {
-	border-right: none;
+.slide{
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.5s;
 }
-
-.cell:nth-child(7), .cell:nth-child(8), .cell:nth-child(9) {
-	border-bottom: none;
+.active-slide{
+  opacity: 1;
+  z-index: 2;
 }
-.cell.x, .cell.circle {
-	cursor: not-allowed;
-}
-/* for cross */
-.board.x .cell:not(.circle):not(.x):hover {
-	background: linear-gradient(to top right, transparent calc(50% - var(--l) / 2), var(--color) calc(50% - var(--l) / 2) calc(50% + var(--l) / 2), transparent calc(50% + var(--l) / 2)),
-				linear-gradient(to bottom right, transparent calc(50% - var(--l) / 2), var(--color) calc(50% - var(--l) / 2) calc(50% + var(--l) / 2), transparent calc(50% + var(--l) / 2));
-	background-size: 80% 80%;
-	background-repeat: no-repeat;
-	background-position: center;
-}
-/* for cross (set) */
-.cell:not(.circle).x {
-	background: linear-gradient(to top right, transparent calc(50% - var(--l) / 2), var(--color-set) calc(50% - var(--l) / 2) calc(50% + var(--l) / 2), transparent calc(50% + var(--l) / 2)),
-				linear-gradient(to bottom right, transparent calc(50% - var(--l) / 2), var(--color-set) calc(50% - var(--l) / 2) calc(50% + var(--l) / 2), transparent calc(50% + var(--l) / 2));
-	background-size: 80% 80%;
-	background-repeat: no-repeat;
-	background-position: center;
-}
-/* for circle */
-.board.circle .cell:not(.circle):not(.x):hover {	
-	background: radial-gradient(var(--color) 60%, transparent 60%);
-}
-
-/* for circle (set) */
-.cell:not(.x).circle {
-	background: radial-gradient(var(--color-set) 60%, transparent 60%);
-}
-.winning-message {
-	display: none;
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: var(--color-set);
-	justify-content: center;
-	align-items: center;
-	color: rgb(139, 8, 8);
-	font-size: 5rem;
-	font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-	flex-direction: column;
-}
-
-.winning-message button {
-	border-radius: 10px;
-	font-size: 3rem;
-	border: 1px solid var(--color-set);
-	padding: .25em .5em;
-	cursor: pointer;
-}
-
-.winning-message button:hover {
-	background-color: var(--color-set);
-	color: rgb(4, 1, 1);
-	border-color: rgb(8, 1, 1);
-}
-.winning-message.show {
-	display: flex;
-	background-image: url(https://th.bing.com/th/id/R.ebe01defac3a4417e8d9a171fd5bd7ba?rik=LjsI86B6eJoHmQ&riu=http%3a%2f%2f3.bp.blogspot.com%2f-nsDsW50UmqU%2fVgSbJtz38pI%2fAAAAAAAABXk%2fr34neFeHcgg%2fs1600%2fhooray.gif&ehk=NNGGjXRJjaGLZqQtSdBH80afiUTWRlm%2fPeRddFg%2byy0%3d&risl=&pid=ImgRaw&r=0);
-    background-repeat: no-repeat;
-    background-size: cover;
-}
-
-.image {
-	text-align: center;
-}
-
-#player {
-	text-align: center;
+.quiz-container{
+  position: relative;
+  height: 200px;
+  margin-top: 40px;
 }
