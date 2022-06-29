@@ -1,156 +1,85 @@
-(function(){
-    // Functions
-    function buildQuiz(){
-      // variable to store the HTML output
-      const output = [];
-  
-      // for each question...
-      myQuestions.forEach(
-        (currentQuestion, questionNumber) => {
-  
-          // variable to store the list of possible answers
-          const answers = [];
-  
-          // and for each available answer...
-          for(letter in currentQuestion.answers){
-  
-            // ...add an HTML radio button
-            answers.push(
-              `<label>
-                <input type="radio" name="question${questionNumber}" value="${letter}">
-                ${letter} :
-                ${currentQuestion.answers[letter]}
-              </label>`
-            );
-          }
-  
-          // add this question and its answers to the output
-          output.push(
-            `<div class="slide">
-              <div class="question"> ${currentQuestion.question} </div>
-              <div class="answers"> ${answers.join("")} </div>
-            </div>`
-          );
-        }
-      );
-  
-      // finally combine our output list into one string of HTML and put it on the page
-      quizContainer.innerHTML = output.join('');
-    }
-  
-    function showResults(){
-  
-      // gather answer containers from our quiz
-      const answerContainers = quizContainer.querySelectorAll('.answers');
-  
-      // keep track of user's answers
-      let numCorrect = 0;
-  
-      // for each question...
-      myQuestions.forEach( (currentQuestion, questionNumber) => {
-  
-        // find selected answer
-        const answerContainer = answerContainers[questionNumber];
-        const selector = `input[name=question${questionNumber}]:checked`;
-        const userAnswer = (answerContainer.querySelector(selector) || {}).value;
-  
-        // if answer is correct
-        if(userAnswer === currentQuestion.correctAnswer){
-          // add to the number of correct answers
-          numCorrect++;
-  
-          // color the answers green
-          answerContainers[questionNumber].style.color = 'blue';
-        }
-        // if answer is wrong or blank
-        else{
-          // color the answers red
-          answerContainers[questionNumber].style.color = 'red';
-        }
-      });
-  
-      // show number of correct answers out of total
-      resultsContainer.innerHTML = `${numCorrect} out of ${myQuestions.length}`;
-    }
-  
-    function showSlide(n) {
-      slides[currentSlide].classList.remove('active-slide');
-      slides[n].classList.add('active-slide');
-      currentSlide = n;
-      if(currentSlide === 0){
-        previousButton.style.display = 'none';
-      }
-      else{
-        previousButton.style.display = 'inline-block';
-      }
-      if(currentSlide === slides.length-1){
-        nextButton.style.display = 'none';
-        submitButton.style.display = 'inline-block';
-      }
-      else{
-        nextButton.style.display = 'inline-block';
-        submitButton.style.display = 'none';
-      }
-    }
-  
-    function showNextSlide() {
-      showSlide(currentSlide + 1);
-    }
-  
-    function showPreviousSlide() {
-      showSlide(currentSlide - 1);
-    }
-  
-    // Variables
-    const quizContainer = document.getElementById('quiz');
-    const resultsContainer = document.getElementById('results');
-    const submitButton = document.getElementById('submit');
-    const myQuestions = [
-      {
-        question: "Who invented JavaScript?",
-        answers: {
-          a: "Douglas Crockford",
-          b: "Sheryl Sandberg",
-          c: "Brendan Eich"
-        },
-        correctAnswer: "c"
-      },
-      {
-        question: "How many people are there in LCJ?",
-        answers: {
-          a: "31",
-          b: "30",
-          c: "32"
-        },
-        correctAnswer: "c"
-      },
-      {
-        question: "Which is the highest peak of the world?",
-        answers: {
-          a: "Mt. K2",
-          b: "Mt. Everest",
-          c: "Mt. Fuji",
-          d: "Denali"
-        },
-        correctAnswer: "b"
-      }
-    ];
-  
-    // Kick things off
-    buildQuiz();
-  
-    // Pagination
-    const previousButton = document.getElementById("previous");
-    const nextButton = document.getElementById("next");
-    const slides = document.querySelectorAll(".slide");
-    let currentSlide = 0;
-  
-    // Show the first slide
-    showSlide(currentSlide);
-  
-    // Event listeners
-    submitButton.addEventListener('click', showResults);
-    previousButton.addEventListener("click", showPreviousSlide);
-    nextButton.addEventListener("click", showNextSlide);
-  })();
-  
+/*jslint browser:true */
+'use strict';
+
+var weatherConditions = new XMLHttpRequest();
+var weatherForecast = new XMLHttpRequest();
+var cObj;
+var fObj;
+
+// GET THE CONDITIONS
+weatherConditions.open('GET', 'https://api.openweathermap.org/data/2.5/weather?zip=11377,us&appid=fec679a41c6af630275b51d1b6ca7c48&units=imperial', true);
+weatherConditions.responseType = 'text';
+weatherConditions.send(null);
+
+weatherConditions.onload = function() {
+    if (weatherConditions.status === 200){
+        cObj = JSON.parse(weatherConditions.responseText); 
+       //console.log(cObj);
+        document.getElementById('location').innerHTML=cObj.name;
+        document.getElementById('weather').innerHTML=cObj.weather[0].description;
+        document.getElementById('temperature').innerHTML=cObj.main.temp;
+        document.getElementById('desc').innerHTML="Wind Speed " + cObj.wind.speed;
+
+
+    } //end if
+}; //end function
+
+
+
+
+
+
+
+
+
+
+// GET THE FORECARST
+weatherForecast.open('GET', 'https://api.openweathermap.org/data/2.5/forecast?zip=11377,us&appid=fec679a41c6af630275b51d1b6ca7c48&units=imperial', true);
+weatherForecast.responseType = 'text'; 
+weatherForecast.send();
+
+weatherForecast.onload = function() {
+if (weatherForecast.status === 200){
+	fObj = JSON.parse(weatherForecast.responseText);
+	console.log(fObj);
+
+    var date_raw = fObj.list[0].dt_txt;
+    date_raw = date_raw.substring(5,11);
+    document.getElementById('r1c1').innerHTML=date_raw;
+	
+    var iconcode = fObj.list[0].weather[0].icon;
+    var icon_path = "http://openweathermap.org/img/w/" + iconcode + ".png";
+    document.getElementById('r1c2').src = icon_path;
+    document.getElementById('r1c3').innerHTML = fObj.list[0].main.temp_min + "&deg;";
+    document.getElementById('r1c4').innerHTML = fObj.list[0].main.temp_max + "&deg;";
+
+
+    var date_raw = fObj.list[8].dt_txt;
+    date_raw = date_raw.substring(5,11);
+    document.getElementById('r2c1').innerHTML=date_raw;
+	
+    var iconcode = fObj.list[8].weather[0].icon;
+    var icon_path = "http://openweathermap.org/img/w/" + iconcode + ".png";
+    document.getElementById('r2c2').src = icon_path;
+    document.getElementById('r2c3').innerHTML = fObj.list[8].main.temp_min + "&deg;";
+    document.getElementById('r2c4').innerHTML = fObj.list[8].main.temp_max + "&deg;";
+
+
+    var date_raw = fObj.list[16].dt_txt;
+    date_raw = date_raw.substring(5,11);
+    document.getElementById('r3c1').innerHTML=date_raw;
+	
+    var iconcode = fObj.list[16].weather[0].icon;
+    var icon_path = "http://openweathermap.org/img/w/" + iconcode + ".png";
+    document.getElementById('r3c2').src = icon_path;
+    document.getElementById('r3c3').innerHTML = fObj.list[16].main.temp_min + "&deg;";
+    document.getElementById('r3c4').innerHTML = fObj.list[16].main.temp_max + "&deg;";
+
+
+} //end if
+}; //end function
+
+
+
+
+
